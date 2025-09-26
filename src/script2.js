@@ -146,16 +146,23 @@ const getWallFactory = (material) => (...args) => new THREE.Mesh(
     material
 )
 
-const wallDepth = 0.02
-const totalHeight = 0.3
-const totalWidth = 0.6
-const totalDepth= 0.7
-const doorWidth = 0.1
-const middleWallDepth = totalDepth - doorWidth
-const kitchenAndRoomDiff = 0.02
-const bathDepth = 0.2
+const step = {value: 0.1}
+
+
 
 const wallFactory = getWallFactory(material);
+
+const createFlat = () => {
+    const wallDepth = step.value * 0.2
+const totalHeight = step.value * 3
+const totalWidth = step.value * 6
+const totalDepth= step.value * 7
+const doorWidth = step.value
+const middleWallDepth = totalDepth - doorWidth
+const kitchenAndRoomDiff = step.value * 0.2
+const bathDepth = step.value*2
+
+
 
 const rightWall = wallFactory(totalHeight, totalDepth, wallDepth)
 rightWall.position.x = totalWidth*0.5-wallDepth/2
@@ -191,7 +198,23 @@ distantWall.rotation.z = Math.PI*0.5
 distantWall.position.z = -(totalDepth*0.5-wallDepth/2)
 distantWall.position.y = totalHeight*0.5
 
-scene.add(rightWall,leftWall, floor, distantWall, middleWall, roomAndBathWall)
+return [rightWall,leftWall, floor, distantWall, middleWall, roomAndBathWall]
+}
+
+let walls = createFlat()
+scene.add(...walls)
+
+
+gui.add(step, 'value').min(0.1).max(0.3).step(0.001).name("Flat size").onFinishChange((v) => {
+    walls.forEach(i => {
+        i.geometry.dispose()
+        i.material.dispose()
+        scene.remove(i)
+    })
+
+    walls = createFlat()
+    scene.add(...walls)
+})
 
 
 
